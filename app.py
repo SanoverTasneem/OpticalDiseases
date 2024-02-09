@@ -1,6 +1,7 @@
 from flask import Flask, render_template_string
 from data_preprocessing import preprocess_data
 from model_pipeline import train_and_evaluate, prepare_data, plot_correlation_matrix
+#from ClusteringNLP import execute_all_nlp_and_clustering_functions
 import pandas as pd
 
 app = Flask(__name__)
@@ -33,6 +34,8 @@ def show_results():
     
     model_results = train_and_evaluate(X, y)
     print("Model Results from train_and_evaluate:", model_results)  # Debug print
+    #operations_summary = execute_all_nlp_and_clustering_functions(df_cleaned)
+    #summary_str = "\n".join(f"{key}: {value}" for key, value in operations_summary.items())
 
     return render_template_string(HTML_TEMPLATE, data_head=df_cleaned.head().to_string(), model_results=model_results)
 

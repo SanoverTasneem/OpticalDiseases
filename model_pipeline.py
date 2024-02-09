@@ -66,7 +66,6 @@ def train_and_evaluate(X, y):
 
 
 
-
 def plot_correlation_matrix(correlation_matrix):
     plt.figure(figsize=(10, 8))
     sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm')
