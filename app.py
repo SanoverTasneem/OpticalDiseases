@@ -1,6 +1,6 @@
 from flask import Flask, render_template_string
 from data_preprocessing import preprocess_data
-from model_pipeline import train_and_evaluate, prepare_data
+from model_pipeline import train_and_evaluate, prepare_data, plot_correlation_matrix
 import pandas as pd
 
 app = Flask(__name__)
@@ -31,13 +31,10 @@ def show_results():
     X = df_cleaned[['Patient Age', 'Patient Sex', 'D', 'H']]  # Example feature selection
     y = df_cleaned['MONR']  # Example target variable
     
-    # Since train_and_evaluate prints results, consider modifying it to return results as a string
-    # For demonstration, let's assume we have a function that returns model results as a string
-    model_results = "Model evaluation results placeholder. Modify train_and_evaluate to return actual results."
-    
-    # Render the HTML page with the data head and model results
+    model_results = train_and_evaluate(X, y)
+    print("Model Results from train_and_evaluate:", model_results)  # Debug print
+
     return render_template_string(HTML_TEMPLATE, data_head=df_cleaned.head().to_string(), model_results=model_results)
-print("Hello, World!")
 
 
 if __name__ == '__main__':

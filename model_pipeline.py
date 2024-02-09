@@ -47,20 +47,24 @@ def train_and_evaluate(X, y):
         "XGBClassifier": (XGBClassifier(use_label_encoder=False, eval_metric='logloss'), param_grid_xgb)
     }
 
+    results_summary = ""  # Initialize an empty string to append results to
     X_train_resampled, X_test, y_train_resampled, y_test = prepare_data(X, y)
 
     for name, (model, param_grid) in models.items():
-        print(f"\nTraining {name} with GridSearchCV...")
         grid_search = GridSearchCV(model, param_grid, cv=5, scoring='roc_auc', n_jobs=-1)
         grid_search.fit(X_train_resampled, y_train_resampled)
         best_model = grid_search.best_estimator_
 
-        print(f"Best Parameters for {name}: {grid_search.best_params_}")
         y_pred = best_model.predict(X_test)
+        results_summary += f"\n{name} Results:\n"
+        results_summary += f"Best Parameters: {grid_search.best_params_}\n"
+        results_summary += f"{classification_report(y_test, y_pred)}"
+        results_summary += f"ROC-AUC Score: {roc_auc_score(y_test, y_pred)}\n"
 
-        print(f"Results for {name}:")
-        print(classification_report(y_test, y_pred))
-        print("ROC-AUC Score:", roc_auc_score(y_test, y_pred))
+    print(results_summary)  # Add this line in train_and_evaluate before the return statement
+    return results_summary
+
+
 
 
 def plot_correlation_matrix(correlation_matrix):
