@@ -37,6 +37,8 @@ def show_results():
     
     # Render the HTML page with the data head and model results
     return render_template_string(HTML_TEMPLATE, data_head=df_cleaned.head().to_string(), model_results=model_results)
+print("Hello, World!")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
