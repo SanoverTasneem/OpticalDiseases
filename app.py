@@ -1,8 +1,28 @@
 from flask import Flask, render_template_string
+import sys
+sys.path.append('/Users/shanu/OpticalDiseases')
 from data_preprocessing import preprocess_data
-from model_pipeline import train_and_evaluate, prepare_data, plot_correlation_matrix
-#from ClusteringNLP import execute_all_nlp_and_clustering_functions
+from model_pipeline import train_and_evaluate
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 app = Flask(__name__)
 
@@ -25,7 +45,7 @@ HTML_TEMPLATE = """
 @app.route('/')
 def show_results():
     # Path to your dataset
-    df_path = 'D:\\Northeastern\\Semester 2\\Python\\Optical Diseases\\full_df.csv'
+    df_path = '/Users/shanu/Desktop/ALY6140/full_df.csv'
     df_cleaned = preprocess_data(df_path)
 
     # Mock-up for displaying purposes - adjust as necessary
@@ -34,13 +54,8 @@ def show_results():
     
     model_results = train_and_evaluate(X, y)
     print("Model Results from train_and_evaluate:", model_results)  # Debug print
-    #operations_summary = execute_all_nlp_and_clustering_functions(df_cleaned)
-    from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-from wordcloud import WordCloud
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.metrics import accuracy_score
+
+    return render_template_string(HTML_TEMPLATE, data_head=df_cleaned.head().to_string(), model_results=model_results)
 
 
 def create_age_groups(df_cleaned):
@@ -55,6 +70,8 @@ def create_age_groups(df_cleaned):
     plt.ylabel('Number of Patients')
     plt.show()
 
+    # Add space after the plot
+    print("\n\n")
 
 def disease_prevalence_across_age_groups(df_cleaned):
     disease_age_df = df_cleaned.groupby(['Age Group', 'labels']).size().unstack(fill_value=0)
@@ -67,6 +84,8 @@ def disease_prevalence_across_age_groups(df_cleaned):
     plt.legend(title='Disease')
     plt.show()
 
+    # Add space after the plot
+    print("\n\n")
 
 def cluster_analysis(df_cleaned):
     features_for_clustering = ['Patient Age', 'Patient Sex', 'D', 'G', 'C', 'A', 'H', 'M']
@@ -81,6 +100,9 @@ def cluster_analysis(df_cleaned):
     cluster_summary = df_cleaned.groupby('Cluster').mean()
     print(cluster_summary)
 
+    # Add space after the plot
+    print("\n\n")
+
 def generate_word_cloud(df_cleaned):
     medical_notes = df_cleaned['Left-Diagnostic Keywords'].str.cat(df_cleaned['Right-Diagnostic Keywords'], sep=' ')
     medical_notes = medical_notes.str.lower().str.replace('[^\w\s]', '')
@@ -91,6 +113,8 @@ def generate_word_cloud(df_cleaned):
     plt.axis('off')
     plt.show()
 
+    # Add space after the plot
+    print("\n\n")
 
 def topic_modeling(df_cleaned):
     medical_notes = df_cleaned['Left-Diagnostic Keywords'].str.cat(df_cleaned['Right-Diagnostic Keywords'], sep=' ')
@@ -104,6 +128,9 @@ def topic_modeling(df_cleaned):
         print(f"Topic {idx}:", ", ".join([vectorizer.get_feature_names_out()[i] for i in topic.argsort()[-10:]]))
 
 
+        # Add space after the plot
+    print("\n\n")
+        
 def classify_medical_notes(df_cleaned):
     X = df_cleaned['Left-Diagnostic Keywords'].str.cat(df_cleaned['Right-Diagnostic Keywords'], sep=' ')
     y = df_cleaned['labels']
@@ -118,8 +145,12 @@ def classify_medical_notes(df_cleaned):
     accuracy = accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
 
+    # Add space after the plot
+    print("\n\n")
+    
 if __name__ == "__main__":
     # Assuming df_cleaned is already defined in your environment
+    df_cleaned = preprocess_data('/Users/shanu/Desktop/ALY6140/full_df.csv')
     create_age_groups(df_cleaned)
     disease_prevalence_across_age_groups(df_cleaned)
     cluster_analysis(df_cleaned)
@@ -127,12 +158,8 @@ if __name__ == "__main__":
     topic_modeling(df_cleaned)
     classify_medical_notes(df_cleaned)
     
-    #summary_str = "\n".join(f"{key}: {value}" for key, value in operations_summary.items())
-
-    return render_template_string(HTML_TEMPLATE, data_head=df_cleaned.head().to_string(), model_results=model_results)
-
-
-if __name__ == '__main__':
     app.run(debug=True)
-
-
+    
+if __name__ == '__main__':
+    try:
+        app.run(debug=True)
